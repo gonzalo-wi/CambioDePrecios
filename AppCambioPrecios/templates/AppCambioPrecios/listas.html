@@ -1,0 +1,93 @@
+{% extends "AppCambioPrecios/base.html" %} {%block titulo%} Listas {%endblock%}
+{% block ttituloBanner %}
+<h2>
+  Listas <span></span> de <br />
+  Precios<span>.</span>
+</h2>
+
+{%endblock%} {%block contenidoCambiante%}
+<style>
+  /* Estilos generales */
+  body {
+  }
+
+  .containerLista {
+    width: 80%;
+    max-width: 900px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 0 auto;
+  }
+
+  /* Estilo para la tabla */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #4caf50;
+    color: white;
+    font-size: 16px;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  /* Estilo para el mensaje si no hay datos */
+  tbody tr td {
+    color: #333;
+    font-size: 14px;
+  }
+
+  /* Centrado y espaciado */
+  .empty-message {
+    text-align: center;
+    color: #999;
+    font-size: 16px;
+    padding: 20px 0;
+  }
+</style>
+
+<div class="containerLista">
+  <h2 style="text-align: center">Listas</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Lista de Precios</th>
+        <th>Producto</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for precio in precios %}
+      <tr>
+        <td>{{ precio.idListaPrecio}}</td>
+        <td>{{ precio.idProducto }}</td>
+        <td>{{ precio.precio }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No hay precios disponibles.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%endblock contenidoCambiante%}

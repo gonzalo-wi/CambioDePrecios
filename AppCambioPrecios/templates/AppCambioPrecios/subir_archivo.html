@@ -1,0 +1,97 @@
+{% extends "AppCambioPrecios/base.html" %} {%block titulo%} Subir Archivo
+{%endblock%} {% block ttituloBanner %}
+<h2>
+  subir <span></span> el <br />
+  archivo<span> Excel.</span>
+</h2>
+{%endblock%} {%block contenidoCambiante%}
+
+<style>
+  .containerExcel {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+    text-align: center;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  input[type="file"] {
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    background-color: #f9f9f9;
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  /* Estilo de los mensajes */
+  .message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  .message.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+  }
+
+  .message.error {
+    background-color: #f2dede;
+    color: #a94442;
+  }
+
+  .message.info {
+    background-color: #d9edf7;
+    color: #31708f;
+  }
+</style>
+<h2 style="text-align: center">
+  Subir el archivo Excel para actualizar las listas de precios
+</h2>
+
+<!-- Mostrar mensajes de Django -->
+{% if messages %}
+<div>
+  {% for message in messages %}
+  <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="containerExcel">
+  <!-- Formulario para subir archivo -->
+  <form method="POST" enctype="multipart/form-data" action="">
+    {% csrf_token %}
+    <div class="form-group">
+      <input type="file" name="archivo_excel" accept=".xlsx" required />
+    </div>
+    <button type="submit">Subir</button>
+  </form>
+</div>
+
+{%endblock contenidoCambiante%}

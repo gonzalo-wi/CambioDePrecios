@@ -6,7 +6,6 @@ from django.conf.urls.static import static
 from .view import saludo
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('listas/', saludo),
     path("", include("AppCambioPrecios.urls")),
     
 ]
