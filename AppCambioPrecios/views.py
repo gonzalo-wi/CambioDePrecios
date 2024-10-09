@@ -32,25 +32,31 @@ def subir_archivo(request):
         try:
             # Cargar el archivo Excel
             wb = openpyxl.load_workbook(archivo_excel)
-            hoja = wb.active  # Asume que los datos están en la primera hoja del archivo
-            
-            # Iterar sobre las filas del archivo Excel (asumiendo que la primera fila tiene encabezados)
-            for fila in hoja.iter_rows(min_row=2, values_only=True):
-                idListaPrecio, idProducto, precio = fila
+            for hoja in wb.sheetnames:
+                sheet = wb[hoja]  # Obtiene la hoja por nombre
 
-                # Crear un nuevo objeto de ListaPrecio
-                Precio.objects.create(
-                    idListaPrecio=idListaPrecio,
-                    idProducto=idProducto,
-                    precio=precio
-                )
+                # Iterar sobre las filas de la hoja, asumiendo que la primera fila tiene los encabezados
+                for fila in sheet.iter_rows(min_row=2, values_only=True):  # Empezamos desde la segunda fila
+                    idListaPrecio, idProducto, precio = fila
+
+                    # Verificar que los datos sean válidos antes de crear el objeto
+                    if idListaPrecio and idProducto and precio is not None:
+                        # Crear un nuevo objeto Precio
+                        Precio.objects.create(
+                            nombreDeLista=hoja ,
+                            idListaPrecio=idListaPrecio,  # Puede ser el ID de la lista (por ejemplo, del archivo Excel o un valor en tu DB)
+                            idProducto=idProducto,
+                            precio=precio,
+                             # Aquí asignamos el nombre de la hoja como el atributo 'nombreDeLista'
+                        )
+            
 
             messages.success(request, "Archivo procesado correctamente y listas de precios actualizadas.")
-            return redirect('AppCambioPrecios/subir_archivo.html')
+            return redirect('subir_archivo')
 
         except Exception as e:
             messages.error(request, f"Error procesando el archivo: {e}")
-            return redirect('AppCambioPrecios/subir_archivo.html')
+            return redirect('subir_archivo')
 
     return render(request, 'AppCambioPrecios/subir_archivo.html')
 

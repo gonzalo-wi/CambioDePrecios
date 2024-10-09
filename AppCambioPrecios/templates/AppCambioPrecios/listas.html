@@ -70,7 +70,8 @@
   <table>
     <thead>
       <tr>
-        <th>Lista de Precios</th>
+        <th>Nombre de Lista</th>
+        <th>Codigo de Lista</th>
         <th>Producto</th>
         <th>Precio</th>
       </tr>
@@ -78,13 +79,14 @@
     <tbody>
       {% for precio in precios %}
       <tr>
+        <td>{{ precio.nombreDeLista}}</td>
         <td>{{ precio.idListaPrecio}}</td>
         <td>{{ precio.idProducto }}</td>
         <td>{{ precio.precio }}</td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="3">No hay precios disponibles.</td>
+        <td colspan="4">No hay precios disponibles.</td>
       </tr>
       {% endfor %}
     </tbody>
