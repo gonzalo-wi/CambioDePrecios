@@ -2,7 +2,6 @@ from django.shortcuts import render
 
 
 import pandas as pd
-
 import openpyxl
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -16,6 +15,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
+from .sincronizacion import sincronizar_precios
 
 
 def inicio(request):
@@ -30,24 +30,24 @@ def subir_archivo(request):
     if request.method == 'POST':
         archivo_excel = request.FILES['archivo_excel']
         try:
-            # Cargar el archivo Excel
+            
             wb = openpyxl.load_workbook(archivo_excel)
             for hoja in wb.sheetnames:
-                sheet = wb[hoja]  # Obtiene la hoja por nombre
+                sheet = wb[hoja]  
 
-                # Iterar sobre las filas de la hoja, asumiendo que la primera fila tiene los encabezados
-                for fila in sheet.iter_rows(min_row=2, values_only=True):  # Empezamos desde la segunda fila
+                
+                for fila in sheet.iter_rows(min_row=2, values_only=True):  
                     idListaPrecio, idProducto, precio = fila
 
-                    # Verificar que los datos sean válidos antes de crear el objeto
+                    
                     if idListaPrecio and idProducto and precio is not None:
-                        # Crear un nuevo objeto Precio
+                        
                         Precio.objects.create(
                             nombreDeLista=hoja ,
-                            idListaPrecio=idListaPrecio,  # Puede ser el ID de la lista (por ejemplo, del archivo Excel o un valor en tu DB)
+                            idListaPrecio=idListaPrecio,  
                             idProducto=idProducto,
                             precio=precio,
-                             # Aquí asignamos el nombre de la hoja como el atributo 'nombreDeLista'
+                             
                         )
             
 
@@ -61,3 +61,9 @@ def subir_archivo(request):
     return render(request, 'AppCambioPrecios/subir_archivo.html')
 
 
+
+def sincronizar_precios_view(request):
+    if request.method == "POST":
+        sincronizar_precios()
+        return render(request, 'AppCambioPrecios/sincronizar_precios.html', {'message': 'Sincronización completada con éxito.'})
+    return render(request, 'AppCambioPrecios/sincronizar_precios.html')
