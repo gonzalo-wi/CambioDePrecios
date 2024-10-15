@@ -1,0 +1,78 @@
+{% extends "AppCambioPrecios/base.html" %} {%block titulo%} Inicio de sesion {%endblock%}
+{% block ttituloBanner %}
+<h2>
+  Inicio <span></span> de <br />
+  Sesion<span>.</span>
+</h2>
+
+{%endblock%} {%block contenidoCambiante%}
+<style>
+  .about{
+    padding: 0%;
+  }
+  body {
+    margin: 0;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-image: url("../../../AppCambioPrecios/static/AppCambioPrecios/assets/images/about/BannerAgua.jpg"); /* Cambia esta ruta */
+    background-size: cover;
+    background-position: center;
+    
+  }
+  
+  .login-container {
+    background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin: auto;
+    margin-top: 200px;
+    
+  }
+  
+  .login-container h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 0;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    margin-left: -10px;
+  }
+  
+  form p {
+    margin: 10px 0;
+   
+  }
+  
+  .btn-submit {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-submit:hover {
+    background-color: #45a049;
+  }
+  
+  </style>
+  
+<div class="login-container">
+  <h2>Iniciar Sesión</h2>
+  <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-submit">Iniciar sesión</button>
+  </form>
+</div>
+
+{%endblock contenidoCambiante%}

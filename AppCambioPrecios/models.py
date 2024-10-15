@@ -10,3 +10,5 @@ class Precio(models.Model):
    def __str__(self):
       
       return f"Nombre de Lista: {self.nombreDeLista}  Codigo: {self.idListaPrecio} - codigo de Producto: {self.idProducto} - Precio: {self.precio}" 
+
+

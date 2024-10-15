@@ -17,15 +17,15 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from .sincronizacion import sincronizar_precios
 
-
+@login_required
 def inicio(request):
     return render(request, "AppCambioPrecios/inicio.html")
-
+@login_required
 def listas(request):
     precios = Precio.objects.all()
     return render(request, "AppCambioPrecios/listas.html",{"precios":precios})
 
-
+@login_required
 def subir_archivo(request):
     if request.method == 'POST':
         archivo_excel = request.FILES['archivo_excel']
@@ -61,9 +61,11 @@ def subir_archivo(request):
     return render(request, 'AppCambioPrecios/subir_archivo.html')
 
 
-
+@login_required
 def sincronizar_precios_view(request):
-    if request.method == "POST":
-        sincronizar_precios()
-        return render(request, 'AppCambioPrecios/sincronizar_precios.html', {'message': 'Sincronización completada con éxito.'})
+    if request.method == 'POST':
+        resultado = sincronizar_precios()
+        messages.success(request, resultado)  
+        print(f"Mensaje: {resultado}") 
+       
     return render(request, 'AppCambioPrecios/sincronizar_precios.html')

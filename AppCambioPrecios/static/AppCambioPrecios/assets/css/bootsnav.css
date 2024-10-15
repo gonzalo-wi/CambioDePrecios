@@ -1472,3 +1472,7 @@ body.on-side .wrap-sticky nav.navbar.bootsnav.sticked{
     }
 }
 
+form{
+    display: inline-block;
+    margin-left: 10px;
+}
