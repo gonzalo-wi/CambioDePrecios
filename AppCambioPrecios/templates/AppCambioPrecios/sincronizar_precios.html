@@ -1,12 +1,29 @@
 {% extends "AppCambioPrecios/base.html" %} {%block titulo%} Sincronizar Precios {%endblock%}
 {% block ttituloBanner %}
-<h2>
+<h2 class="animated-title">
     Sincronizar <span></span> los <br />
     Precios<span>con Aguas.</span>
   </h2>
   
   {%endblock%} {%block contenidoCambiante%}
 <style>
+    .section-heading h2 {
+      padding-bottom: 0%;
+      border-bottom:none ;
+    }
+    .animated-title {
+        font-size: 2rem; /* Tamaño del texto */
+        text-align: center; /* Centrar el texto */
+        opacity: 0; /* Comenzar oculto */
+        transform: translateY(-20px); /* Mover el título hacia arriba */
+        animation: fadeInUp 1s forwards; /* Aplicar la animación */
+    }
+@keyframes fadeInUp {
+        to {
+            opacity: 1; /* Finaliza visible */
+            transform: translateY(0); /* Restablece la posición */
+        }
+    }
     
     .card {
         max-width: 600px;
@@ -16,7 +33,7 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .btn-sincronizar {
-        background-color: #45a049;
+        background-color: #50C878;
         color: white;
     }
 </style>

@@ -1,12 +1,29 @@
 {% extends "AppCambioPrecios/base.html" %} {%block titulo%} Subir Archivo
 {%endblock%} {% block ttituloBanner %}
-<h2>
+<h2 class="animated-title">
   subir <span></span> el <br />
   archivo<span> Excel.</span>
 </h2>
 {%endblock%} {%block contenidoCambiante%}
 
 <style>
+  .animated-title {
+        font-size: 2rem; /* Tamaño del texto */
+        text-align: center; /* Centrar el texto */
+        opacity: 0; /* Comenzar oculto */
+        transform: translateY(-20px); /* Mover el título hacia arriba */
+        animation: fadeInUp 1s forwards; /* Aplicar la animación */
+    }
+@keyframes fadeInUp {
+        to {
+            opacity: 1; /* Finaliza visible */
+            transform: translateY(0); /* Restablece la posición */
+        }
+    }
+    .section-heading h2 {
+      padding-bottom: 0%;
+      border-bottom:none ;
+    }
   .containerExcel {
     max-width: 600px;
     margin: 0 auto;
@@ -32,7 +49,7 @@
 
   button {
     padding: 10px 20px;
-    background-color: #4caf50;
+    background-color: #50C878;
     border: none;
     color: white;
     font-size: 16px;
@@ -42,7 +59,7 @@
   }
 
   button:hover {
-    background-color: #45a049;
+    background-color: #50C878;;
   }
 
   /* Estilo de los mensajes */

@@ -7,9 +7,13 @@
 
 {%endblock%} {%block contenidoCambiante%}
 <style>
-  .about{
-    padding: 0%;
+  .about {
+    padding: 0;
   }
+  h1{
+    color: #114c5f;
+  }
+
   body {
     margin: 0;
     height: 100vh;
@@ -18,9 +22,23 @@
     background-image: url("../../../AppCambioPrecios/static/AppCambioPrecios/assets/images/about/BannerAgua.jpg"); /* Cambia esta ruta */
     background-size: cover;
     background-position: center;
-    
   }
   
+  .title-container {
+    text-align: center;
+    margin-top: 50px; /* Espacio desde la parte superior */
+    color: white; /* Color del texto */
+    font-family: 'Arial', sans-serif; /* Tipo de fuente */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Sombra para mejor legibilidad */
+  }
+
+  .title-container h1 {
+    font-size: 6rem; /* Tamaño del texto */
+    margin: 0; /* Sin margen */
+    padding: 50px 0; /* Espacio alrededor del texto */
+    letter-spacing: 2px; /* Espaciado entre letras */
+  }
+
   .login-container {
     background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
     padding: 20px;
@@ -29,8 +47,7 @@
     max-width: 600px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     margin: auto;
-    margin-top: 200px;
-    
+    margin-top: 20px; /* Espacio desde el título */
   }
   
   .login-container h2 {
@@ -38,7 +55,7 @@
     text-align: center;
     padding-bottom: 0;
   }
-  
+
   form {
     display: flex;
     flex-direction: column;
@@ -47,11 +64,10 @@
   
   form p {
     margin: 10px 0;
-   
   }
   
   .btn-submit {
-    background-color: #4CAF50;
+    background-color: #50C878;
     color: white;
     border: none;
     padding: 10px;
@@ -61,11 +77,14 @@
   }
   
   .btn-submit:hover {
-    background-color: #45a049;
+    background-color: #32e26d;
   }
-  
-  </style>
-  
+</style>
+
+<div class="title-container">
+  <h1>Gestión de Precios Aguas</h1> <!-- Título estilizado -->
+</div>
+
 <div class="login-container">
   <h2>Iniciar Sesión</h2>
   <form method="post">

@@ -112,7 +112,7 @@
 				<div class="row">
 					<div class="col-md-12 text-center">
 						<div class="header-text">
-							<h2>Bienvenido <span></span> a <br> cambio de <br> precios <span>.</span>   </h2>
+							<h2 class="animated-title">Bienvenido <span></span> a <br> cambio de <br> precios <span>.</span>   </h2>
 							<p>Cargar nuevas listas</p>
 							<a href={%url "subir_archivo" %}>Subir Excel</a>
 						</div><!--/.header-text-->
@@ -267,5 +267,21 @@
         <script src="{%static 'AppCambioPrecios/assets/js/custom.js'%}"></script>
         
     </body>
+	<style>
+	.animated-title {
+        font-size: 2rem; /* Tamaño del texto */
+        text-align: center; /* Centrar el texto */
+        opacity: 0; /* Comenzar oculto */
+        transform: translateY(-20px); /* Mover el título hacia arriba */
+        animation: fadeInUp 1s forwards; /* Aplicar la animación */
+    }
+@keyframes fadeInUp {
+        to {
+            opacity: 1; /* Finaliza visible */
+            transform: translateY(0); /* Restablece la posición */
+        }
+    }
+</style>
+
 	
 </html>
