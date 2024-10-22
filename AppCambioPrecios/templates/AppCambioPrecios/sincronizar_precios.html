@@ -1,39 +1,43 @@
-{% extends "AppCambioPrecios/base.html" %} {%block titulo%} Sincronizar Precios {%endblock%}
+{% extends "AppCambioPrecios/base.html" %}
+{% block titulo %} Gestion Precios | Sincronizar {% endblock %}
 {% block ttituloBanner %}
 <h2 class="animated-title">
     Sincronizar <span></span> los <br />
     Precios<span>con Aguas.</span>
-  </h2>
-  
-  {%endblock%} {%block contenidoCambiante%}
+</h2>
+{% endblock %}
+{% block contenidoCambiante %}
 <style>
     .section-heading h2 {
-      padding-bottom: 0%;
-      border-bottom:none ;
+        padding-bottom: 0%;
+        border-bottom: none;
     }
     .animated-title {
-        font-size: 2rem; /* Tamaño del texto */
-        text-align: center; /* Centrar el texto */
-        opacity: 0; /* Comenzar oculto */
-        transform: translateY(-20px); /* Mover el título hacia arriba */
-        animation: fadeInUp 1s forwards; /* Aplicar la animación */
+        font-size: 2rem; 
+        text-align: center; 
+        opacity: 0; 
+        transform: translateY(-20px); 
+        animation: fadeInUp 1s forwards; 
     }
-@keyframes fadeInUp {
+    @keyframes fadeInUp {
         to {
-            opacity: 1; /* Finaliza visible */
-            transform: translateY(0); /* Restablece la posición */
+            opacity: 1; 
+            transform: translateY(0); 
         }
     }
-    
     .card {
         max-width: 600px;
         margin: auto;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     .btn-sincronizar {
         background-color: #50C878;
+        color: white;
+    }
+    .btn-volver-atras {
+        background-color: #FF6347; 
         color: white;
     }
 </style>
@@ -44,7 +48,7 @@
         <div class="card text-center">
             <h2 class="card-title">Sincronización de Precios</h2>
             
-            <!-- Sección para mostrar mensajes -->
+            
             {% if messages %}
                 <div class="alert alert-info" role="alert">
                     <ul>
@@ -56,13 +60,17 @@
             {% endif %}
     
             <p class="card-text">Haz clic en el botón de abajo para iniciar la sincronización de precios entre la base de datos local y Aguas.</p>
-            <form method="post">
+            <form method="post" action="{% url 'sincronizar_precios' %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-sincronizar btn-lg">Sincronizar Precios</button>
+            </form>
+            <form method="post" action="{% url 'sincronizar_precios' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-volver-atras btn-lg" name="action" value="restaurar">Volver Atrás los precios</button>
             </form>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-    {% endblock contenidoCambiante %}
+</body>
+{% endblock contenidoCambiante %}

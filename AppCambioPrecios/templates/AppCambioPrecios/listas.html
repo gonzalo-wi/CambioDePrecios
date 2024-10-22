@@ -1,33 +1,32 @@
-{% extends "AppCambioPrecios/base.html" %} {%block titulo%} Listas {%endblock%}
+{% extends "AppCambioPrecios/base.html" %}
+{% load custom %}
+{% block titulo %} Gestion Precios | Listas {% endblock %}
 {% block ttituloBanner %}
 <h2 class="animated-title">
   Listas <span></span> de <br />
   Precios<span>.</span>
 </h2>
-
-{%endblock%} {%block contenidoCambiante%}
+{% endblock %}
+{% block contenidoCambiante %}
 <style>
   /* Estilos generales */
-  
-	.animated-title {
-        font-size: 2rem; /* Tamaño del texto */
-        text-align: center; /* Centrar el texto */
-        opacity: 0; /* Comenzar oculto */
-        transform: translateY(-20px); /* Mover el título hacia arriba */
-        animation: fadeInUp 1s forwards; /* Aplicar la animación */
+  .animated-title {
+    font-size: 2rem; /* Tamaño del texto */
+    text-align: center; /* Centrar el texto */
+    opacity: 0; /* Comenzar oculto */
+    transform: translateY(-20px); /* Mover el título hacia arriba */
+    animation: fadeInUp 1s forwards; /* Aplicar la animación */
+  }
+  @keyframes fadeInUp {
+    to {
+      opacity: 1; /* Finaliza visible */
+      transform: translateY(0); /* Restablece la posición */
     }
-@keyframes fadeInUp {
-        to {
-            opacity: 1; /* Finaliza visible */
-            transform: translateY(0); /* Restablece la posición */
-        }
-    }
-    .section-heading h2 {
-      padding-bottom: 0%;
-      border-bottom:none ;
-    }
-
-
+  }
+  .section-heading h2 {
+    padding-bottom: 0%;
+    border-bottom: none;
+  }
   .containerLista {
     width: 80%;
     max-width: 900px;
@@ -37,41 +36,33 @@
     border-radius: 10px;
     margin: 0 auto;
   }
-
   /* Estilo para la tabla */
   table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
   }
-
-  th,
-  td {
+  th, td {
     padding: 12px;
     text-align: center;
     border: 1px solid #ddd;
   }
-
   th {
-    background-color:#50C878;
+    background-color: #50C878;
     color: white;
     font-size: 16px;
   }
-
   tr:nth-child(even) {
     background-color: #f2f2f2;
   }
-
   tr:hover {
     background-color: #f1f1f1;
   }
-
   /* Estilo para el mensaje si no hay datos */
   tbody tr td {
     color: #333;
     font-size: 14px;
   }
-
   /* Centrado y espaciado */
   .empty-message {
     text-align: center;
@@ -81,32 +72,59 @@
   }
 </style>
 
-<div class="containerLista">
-  <h2 style="text-align: center">Listas</h2>
+<h2>Listas de Precios</h2>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre de Lista</th>
-        <th>Codigo de Lista</th>
-        <th>Producto</th>
-        <th>Precio</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for precio in precios %}
-      <tr>
-        <td>{{ precio.nombreDeLista}}</td>
-        <td>{{ precio.idListaPrecio}}</td>
-        <td>{{ precio.idProducto }}</td>
-        <td>{{ precio.precio }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="4">No hay precios disponibles.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{%endblock contenidoCambiante%}
+{% if mensaje %}
+    <div class="alert alert-warning">{{ mensaje }}</div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre de Lista</th>
+                <th>ID Producto</th>
+                <th>Precio Actual</th>
+                <th>Precio Anterior</th>
+                <th>Modificar Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for precio in precios %}
+                <tr>
+                    <td>{{ precio.nombreDeLista }}</td>
+                    <td>{{ precio.idProducto }}</td>
+                    <td>{{ precio.precio }}</td>
+                    <td>
+                        {% with precios_anteriores|get_item:precio.idProducto as precio_anterior %}
+                            {% if precio_anterior %}
+                                {{ precio_anterior.precio_anterior }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <input type="text" name="precio_{{ precio.idProducto }}" placeholder="Nuevo Precio">
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">No hay precios disponibles.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Actualizar Precios</button>
+</form>
+
+{% if diferencias %}
+    <h3>Diferencias encontradas</h3>
+    <ul>
+        {% for diferencia in diferencias %}
+            <li>Producto {{ diferencia.0 }}: de {{ diferencia.1 }} a {{ diferencia.2 }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

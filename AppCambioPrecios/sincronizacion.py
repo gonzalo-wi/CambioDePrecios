@@ -3,6 +3,7 @@ from .models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.db import transaction
+from django.db import IntegrityError
 
 def obtener_conexion():
     conn_str = (
@@ -16,11 +17,40 @@ def obtener_conexion():
     return pyodbc.connect(conn_str)
 
 def guardar_precio_anterior(precio):
-    PrecioAntiguo.objects.create(
-        idListaPrecio=precio.idListaPrecio,
-        idProducto=precio.idProducto,
-        precio_anterior=precio.precio
-    )
+    try:
+        
+        conn = obtener_conexion()
+        cursor = conn.cursor()
+        
+        
+        cursor.execute("""
+            SELECT idListaPrecio, idProducto, precio
+            FROM Precios
+            WHERE idListaPrecio = ?
+        """, precio.idListaPrecio)
+        
+        
+        for row in cursor.fetchall():
+            try:
+                PrecioAntiguo.objects.get(
+                    idListaPrecio=row.idListaPrecio,
+                    idProducto=row.idProducto
+                )
+            except PrecioAntiguo.DoesNotExist:
+                PrecioAntiguo.objects.create(
+                    idListaPrecio=row.idListaPrecio,
+                    idProducto=row.idProducto,
+                    precio_anterior=row.precio
+                )
+            except IntegrityError:
+                print("Error al guardar el precio anterior.")
+        
+        
+        cursor.close()
+        conn.close()
+        
+    except pyodbc.Error as e:
+        print(f"Error al conectar a la base de datos: {e}")
 
 def actualizar_precio(cursor, precio):
     query_update = """
@@ -31,17 +61,51 @@ def actualizar_precio(cursor, precio):
     cursor.execute(query_update, precio.precio, precio.idListaPrecio, precio.idProducto)
 
 def guardar_precios_clientes(cursor):
-    query_select = "SELECT NroCta, IdProducto, Precio FROM dbo.Precios_Clientes"
-    cursor.execute(query_select)
-    
-    for row in cursor.fetchall():
-        NroCta, IdProducto, Precio = row
+    try:
         
-        PrecioCliente.objects.create(
-            nroCta=NroCta,
-            idProducto=IdProducto,
-            precio=Precio
-        )
+        cursor.execute("""
+            IF OBJECT_ID('dbo.Backup_Precios_Clientes', 'U') IS NOT NULL
+            DROP TABLE dbo.Backup_Precios_Clientes
+        """)
+
+        
+        cursor.execute("""
+            IF OBJECT_ID('dbo.Backup_Precios_Clientes', 'U') IS NULL
+            CREATE TABLE dbo.Backup_Precios_Clientes (
+                NroCta INT,
+                IdProducto VARCHAR(50),
+                Precio DECIMAL(18, 3)
+            )
+        """)
+
+        
+        cursor.execute("""
+            INSERT INTO dbo.Backup_Precios_Clientes (NroCta, IdProducto, Precio)
+            SELECT NroCta, IdProducto, Precio FROM dbo.Precios_Clientes
+        """)
+
+        
+        cursor.execute("SELECT * FROM dbo.Backup_Precios_Clientes")
+        for row in cursor.fetchall():
+            print(row)
+
+    except pyodbc.Error as e:
+        print(f"Error al crear o insertar en la tabla Backup_Precios_Clientes: {e}")
+        raise
+    
+def restaurar_precios_clientes(cursor):
+    try:
+       
+        cursor.execute("""
+            UPDATE dbo.Precios_Clientes
+            SET Precio = b.Precio
+            FROM dbo.Backup_Precios_Clientes b
+            WHERE dbo.Precios_Clientes.NroCta = b.NroCta
+            AND dbo.Precios_Clientes.IdProducto = b.IdProducto
+        """)
+    except pyodbc.Error as e:
+        print(f"Error al restablecer los valores de la tabla Backup_Precios_Clientes: {e}")
+        raise
 
 def sincronizar_precios():
     mensaje = ""
@@ -58,7 +122,7 @@ def sincronizar_precios():
             actualizar_precio(cursor, precio)
 
         
-        guardar_precios_clientes(cursor)
+        
 
         conn.commit()
         mensaje = "Sincronización exitosa."
@@ -80,47 +144,42 @@ def sincronizar_precios():
     
     return mensaje
 
+
 def restaurar_precios(request):
     mensaje = ""
+    cursor_remoto = None
+    conn_remota = None
 
     try:
         precios_antiguos = PrecioAntiguo.objects.all()
 
-        if not precios_antiguos.exists():
-            return JsonResponse({'mensaje': "No hay precios antiguos para restaurar."})
+        
+        conn_remota = obtener_conexion()
+        cursor_remoto = conn_remota.cursor()
 
-        with obtener_conexion() as conn_remota:
-            cursor_remoto = conn_remota.cursor()
-            with transaction.atomic():
-                # Actualizar precios locales
-                for precio_antiguo in precios_antiguos:
-                    Precio.objects.filter(
-                        idListaPrecio=precio_antiguo.idListaPrecio,
-                        idProducto=precio_antiguo.idProducto
-                    ).update(precio=precio_antiguo.precio_anterior)
+        
+        for precio_antiguo in precios_antiguos:
+            if precio_antiguo.precio_anterior is not None:
+                query_update = """
+                    UPDATE dbo.Precios 
+                    SET Precio = ? 
+                    WHERE IdListaPrecio = ? AND IdProducto = ?
+                """
+                cursor_remoto.execute(query_update, precio_antiguo.precio_anterior, precio_antiguo.idListaPrecio, precio_antiguo.idProducto)
 
-                    # Actualizar precios en la base de datos remota
-                    query_update = """
-                        UPDATE dbo.Precios 
-                        SET Precio = ? 
-                        WHERE IdListaPrecio = ? AND IdProducto = ?
-                    """
-                    cursor_remoto.execute(query_update, (precio_antiguo.precio_anterior, precio_antiguo.idListaPrecio, precio_antiguo.idProducto))
+        
+        restaurar_precios_clientes(cursor_remoto)
 
-                # Actualizar precios de clientes
-                precios_clientes_antiguos = PrecioCliente.objects.all()
-                for precio_cliente_antiguo in precios_clientes_antiguos:
-                    query_update_cliente = """
-                        UPDATE dbo.Precios_Clientes 
-                        SET Precio = ? 
-                        WHERE NroCta = ? AND IdProducto = ?
-                    """
-                    cursor_remoto.execute(query_update_cliente, (precio_cliente_antiguo.precio, precio_cliente_antiguo.nroCta, precio_cliente_antiguo.idProducto))
-
-            conn_remota.commit()
-            mensaje = "Precios restaurados y sincronizados con la base de datos remota."
+        conn_remota.commit()
+        mensaje = "Precios restaurados y sincronizados con la base de datos Aguas."
 
     except Exception as e:
         mensaje = f"Error al restaurar precios: {e}"
 
-    return JsonResponse({'mensaje': mensaje})
+    finally:
+        if cursor_remoto is not None:
+            cursor_remoto.close()
+        if conn_remota is not None:
+            conn_remota.close()
+
+    return (mensaje)

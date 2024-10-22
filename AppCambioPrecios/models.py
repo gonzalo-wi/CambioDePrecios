@@ -5,7 +5,7 @@ class Precio(models.Model):
    nombreDeLista = models.CharField(max_length=255)
    idListaPrecio = models.CharField(max_length=30)
    idProducto= models.CharField(max_length=30)
-   precio = models.IntegerField()
+   precio = models.DecimalField(max_digits=10, decimal_places=3)
 
    def __str__(self):
       
@@ -17,6 +17,8 @@ class PrecioAntiguo(models.Model):
     idProducto = models.CharField(max_length=30)
     precio_anterior = models.DecimalField(max_digits=10, decimal_places=3)
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('idListaPrecio', 'idProducto')
     
 
 class PrecioCliente(models.Model):
