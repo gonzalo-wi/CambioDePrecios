@@ -1,17 +1,19 @@
+import time
 import pyodbc
 from .models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.db import transaction
 from django.db import IntegrityError
+from django.db import connection
 
 def obtener_conexion():
     conn_str = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
-        "SERVER=192.168.0.5;"
-        "DATABASE=H2O_JUMI_29_12_23;"
-        "UID=Cafe;"
-        "PWD=JumiCAFE3241;"
+        "SERVER=192.168.0.234;"
+        "DATABASE=H2O_JUMI;"
+        "UID=h2o;"
+        "PWD=Jumi1234;"
         "TrustServerCertificate=yes;"
     )
     return pyodbc.connect(conn_str)
@@ -52,6 +54,142 @@ def guardar_precio_anterior(precio):
     except pyodbc.Error as e:
         print(f"Error al conectar a la base de datos: {e}")
 
+def ejecutar_primer_script():
+    script_sql = """
+    DROP TABLE IF EXISTS tmp_descuentosXporcentaje;
+
+    SELECT c.nrocta, p.idproducto, precio, preciolista = (SELECT dbo.Get_PrecioPorClienteProducto_sinprecioespecial(c.nrocta, p.idproducto, 0, 0)), 
+           descuento = CONVERT(NUMERIC(18, 2), 0), atrib2, atrib3, atrib4, atrib5
+    INTO tmp_descuentosXporcentaje
+    FROM clientes c 
+    INNER JOIN precios_clientes p ON p.nrocta = c.nrocta
+    ORDER BY c.nrocta, p.idproducto;
+
+    UPDATE tmp_descuentosXporcentaje 
+    SET descuento = CONVERT(NUMERIC(18, 2), 100 - (precio * 100) / CASE preciolista WHEN 0 THEN 1 ELSE preciolista END);
+    """
+
+    try:
+        conn = obtener_conexion()
+        cursor = conn.cursor()
+        
+        # Ejecutar cada comando individualmente
+        for command in script_sql.split(';'):
+            if command.strip():
+                cursor.execute(command)
+        
+        conn.commit()
+        print("Script SQL ejecutado correctamente.")
+        
+    except pyodbc.Error as e:
+        print(f"Error al ejecutar el script SQL: {e}")
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()     
+def agregar_columna():
+    script = """
+    ALTER TABLE tmp_descuentosXporcentaje
+    ADD precio_mod NUMERIC(18,2);
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(script)
+def actualizar_precios():
+    script = """
+    UPDATE tmp_descuentosXporcentaje
+    SET precio_mod = (
+        SELECT dbo.Get_PrecioPorClienteProducto_sinprecioespecial(
+            tmp_descuentosXporcentaje.nrocta,
+            tmp_descuentosXporcentaje.idproducto,
+            0, 0
+        )
+    );
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(script)      
+def eliminar_precios_antiguos():
+    script = """
+    DELETE FROM Precios_Clientes
+    WHERE nrocta IN (
+        SELECT nrocta FROM tmp_descuentosXporcentaje
+    );
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(script)
+def insertar_nuevos_precios():
+    script = """
+    INSERT INTO Precios_Clientes (nrocta, idproducto, precio_descuento_esp)
+    SELECT
+        nrocta,
+        idproducto,
+        DBO.GET_ROUND_ESP(
+            DBO.GET_ROUND_UP_5(
+                ROUND(precio_mod - DBO.GET_ROUND_UP_5(
+                    ROUND(precio_mod * (descuento / 100), 0)
+                ), 0)
+            )
+        )
+    FROM tmp_descuentosXporcentaje
+    WHERE descuento > 0;
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(script)
+        
+def ejecutar_script_completo():
+    try:
+        agregar_columna()
+        actualizar_precios()
+        eliminar_precios_antiguos()
+        insertar_nuevos_precios()
+        print("Script ejecutado exitosamente.")
+    except Exception as e:
+        print(f"Error al ejecutar el script: {e}")     
+
+def ejecutar_segundo_script():
+    try:
+        ejecutar_script_completo()
+        mensaje = "Script SQL ejecutado correctamente."
+        print(mensaje)
+    except Exception as e:
+        mensaje = f"Error al ejecutar el script SQL: {e}"
+        print(mensaje)
+    return mensaje           
+def sincronizar_precios():
+    mensaje = ""
+    cursor = None  
+    conn = None 
+    try:
+        conn = obtener_conexion()
+        cursor = conn.cursor()
+        
+        precios_locales = Precio.objects.all()
+        
+        for precio in precios_locales:
+            guardar_precio_anterior(precio)
+            actualizar_precio(cursor, precio)
+
+        conn.commit()
+        
+        mensaje = "Sincronización exitosa."
+    
+    except pyodbc.Error as e:
+        mensaje = f"No se puede sincronizar: {e}"
+    
+    except ObjectDoesNotExist:
+        mensaje = "Error: No se encontraron precios locales."
+    
+    except Exception as e:
+        mensaje = f"Tiempo agotado o error inesperado: {e}"
+    
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+    
+    return mensaje
 def actualizar_precio(cursor, precio):
     query_update = """
         UPDATE dbo.Precios 
@@ -152,22 +290,20 @@ def restaurar_precios(request):
 
     try:
         precios_antiguos = PrecioAntiguo.objects.all()
+        print(f"Precios antiguos: {precios_antiguos}")
 
-        
         conn_remota = obtener_conexion()
         cursor_remoto = conn_remota.cursor()
 
-        
         for precio_antiguo in precios_antiguos:
-            if precio_antiguo.precio_anterior is not None:
-                query_update = """
-                    UPDATE dbo.Precios 
-                    SET Precio = ? 
-                    WHERE IdListaPrecio = ? AND IdProducto = ?
-                """
-                cursor_remoto.execute(query_update, precio_antiguo.precio_anterior, precio_antiguo.idListaPrecio, precio_antiguo.idProducto)
+            precio_antiguo.precio_anterior
+            query_update = """
+                UPDATE dbo.Precios 
+                SET Precio = ? 
+                WHERE IdListaPrecio = ? AND IdProducto = ?
+            """
+            cursor_remoto.execute(query_update, precio_antiguo.precio_anterior, precio_antiguo.idListaPrecio, precio_antiguo.idProducto)
 
-        
         restaurar_precios_clientes(cursor_remoto)
 
         conn_remota.commit()
@@ -175,6 +311,7 @@ def restaurar_precios(request):
 
     except Exception as e:
         mensaje = f"Error al restaurar precios: {e}"
+        print(mensaje)
 
     finally:
         if cursor_remoto is not None:
@@ -182,4 +319,4 @@ def restaurar_precios(request):
         if conn_remota is not None:
             conn_remota.close()
 
-    return (mensaje)
+    return mensaje

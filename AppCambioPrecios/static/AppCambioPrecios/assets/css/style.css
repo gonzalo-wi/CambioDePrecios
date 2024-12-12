@@ -193,7 +193,7 @@ nav.navbar.bootsnav .navbar-toggle i{color: #50C878;}
     background:url(../images/about/BannerAgua.jpg)no-repeat;
     background-size:cover;
     background-position: center;
-    height:890px;
+    height:700px;
 }
 .welcome-hero:before{
     position:absolute;
@@ -342,7 +342,7 @@ nav.navbar.bootsnav .navbar-toggle i{color: #50C878;}
 .single-horizontal-timeline .experience-time h3{text-transform: capitalize;}
 .single-horizontal-timeline .experience-time h3 span{text-transform:lowercase;}
 .single-horizontal-timeline .timeline-content h5 {margin: 15px 0;}
-.single-horizontal-timeline p {color: #999fb3;max-width: 335px;}
+
 
 /*.timeline-horizontal-border*/
 .timeline-horizontal-border {
@@ -379,7 +379,7 @@ span.single-timeline-horizontal.spacial-horizontal-line {width: 88px;}
     font-weight: 600;
     text-transform: uppercase;
     padding-bottom: 0;
-    border-bottom: 1px solid #e5ebf2;
+    border-bottom: 0;
 }
 .single-progress-txt {
     display: flex;

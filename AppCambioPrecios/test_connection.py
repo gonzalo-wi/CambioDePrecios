@@ -2,10 +2,10 @@ import pyodbc
 
 """conn_str = (
     "Driver={ODBC Driver 18 for SQL Server};"
-    "Server=192.168.0.5;"
-    "Database=H2O_JUMI_29_12_23;"
-    "UID=Cafe;"
-    "PWD=JumiCAFE3241;"
+    "Server=192.168.0.234;"
+    "Database=H2O_JUMI;"
+    "UID=h2o;"
+    "PWD=Jumi1234;"
     "TrustServerCertificate=yes;"
 )
 
@@ -18,10 +18,10 @@ except Exception as e:
 
 conn_str = (
     "Driver={ODBC Driver 18 for SQL Server};"
-    "Server=192.168.0.5;"
-    "Database=H2O_JUMI_29_12_23;"
-    "UID=Cafe;"
-    "PWD=JumiCAFE3241;"
+    "Server=192.168.0.234;"
+    "Database=H2O_JUMI;"
+    "UID=h2o;"
+    "PWD=Jumi1234;"
     "TrustServerCertificate=yes;"
 )
 

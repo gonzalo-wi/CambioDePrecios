@@ -1,13 +1,52 @@
 {% extends "AppCambioPrecios/base.html" %}
-{% block titulo %} Gestion Precios | Sincronizar {% endblock %}
+{% block titulo %} Gestión Precios | Sincronizar {% endblock %}
 {% block ttituloBanner %}
 <h2 class="animated-title">
     Sincronizar <span></span> los <br />
     Precios<span>con Aguas.</span>
 </h2>
+<div class="container">
+    <div class="card text-center">
+        
+        
+        {% if messages %}
+            <div class="alert alert-info" role="alert">
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <p class="card-text">Haz clic en el botón de abajo para iniciar la sincronización de precios entre la base de datos local y Aguas.</p>
+<form method="post" action="{% url 'sincronizar_precios' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sincronizar btn-lg" onclick="confirmarAccion(event, 'Está por sincronizar los precios a la Base de Aguas. Aceptar para continúa con el proceso, Cancelar para volver atrás.')">Sincronizar Precios</button>
+</form>
+<form method="post" action="{% url 'restaurar_precios' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-volver-atras btn-lg" onclick="confirmarAccion(event, 'Está por restaurar los precios de Aguas. Aceptar continúa con el proceso, Cancelar para volver atrás.')">Volver Atrás los precios</button>
+</form>
+    </div>
+</div>
+
 {% endblock %}
 {% block contenidoCambiante %}
 <style>
+    .navbar {
+            background-color: black !important; 
+             
+        }
+         /* Invertir colores del logo si es necesario */
+        
+        .navbar .dropdown-menu {
+            background-color: black; /* Fondo negro para el menú desplegable */
+        }
+        .navbar .dropdown-menu a:hover {
+            color: #50C878 !important; /* Color verde esmeralda al pasar el cursor */
+            text-decoration: underline; /* Subrayar al pasar el cursor */
+        } 
+        
     .section-heading h2 {
         padding-bottom: 0%;
         border-bottom: none;
@@ -40,37 +79,330 @@
         background-color: #FF6347; 
         color: white;
     }
+    .carousel-inner .item {
+            display: flex;
+            justify-content: center;
+        }
+        .carousel-inner .item .col-sm-4 {
+            float: none;
+            display: inline-block;
+            vertical-align: middle;
+        }
+		.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1250px;
+  margin: 2rem auto;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide {
+  display: flex;
+  flex: 1 0 100%;
+  justify-content: space-around;
+}
+
+.step {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 4rem;
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.step h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.step p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .carousel-slide {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+.carousel-inner .item {
+            display: flex;
+            justify-content: center;
+        }
+        .carousel-inner .item .col-sm-4 {
+            float: none;
+            display: inline-block;
+            vertical-align: middle;
+        }
+		.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1450px;
+  margin: 2rem auto;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide {
+  display: flex;
+  flex: 1 0 100%;
+  justify-content: space-around;
+}
+
+.step {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 4rem;
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.step h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.step p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+.timeline-content p.description {
+        font-family: 'Arial', sans-serif;
+        font-size: 16px;
+        color: #666;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .carousel-slide {
+    flex-direction: column;
+    align-items: center;
+  }
+}
 </style>
+<script>
+    function confirmarAccion(event, mensaje) {
+        event.preventDefault(); // Prevenir el envío del formulario por defecto
+        if (confirm(mensaje)) {
+            event.target.form.submit(); // Enviar el formulario si se acepta
+        }
+    }
+    let currentSlide = 0;
+
+function showSlide() {
+  const carousel = document.querySelector('.carousel');
+  carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+}
+
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % 2;  // Hay dos "slides"
+  showSlide();
+}
+
+function prevSlide() {
+  currentSlide = (currentSlide - 1 + 2) % 2;
+  showSlide();
+}
+</script>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card text-center">
-            <h2 class="card-title">Sincronización de Precios</h2>
-            
-            
-            {% if messages %}
-                <div class="alert alert-info" role="alert">
-                    <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
     
-            <p class="card-text">Haz clic en el botón de abajo para iniciar la sincronización de precios entre la base de datos local y Aguas.</p>
-            <form method="post" action="{% url 'sincronizar_precios' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sincronizar btn-lg">Sincronizar Precios</button>
-            </form>
-            <form method="post" action="{% url 'sincronizar_precios' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-volver-atras btn-lg" name="action" value="restaurar">Volver Atrás los precios</button>
-            </form>
-        </div>
-    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <section id="education" class="education">
+        <div class="section-heading text-center">
+            <h2>Pasos a seguir</h2>
+        </div>
+        <div class="carousel-container">
+            <div class="carousel">
+              <div class="carousel-slide">
+                <div class="step">
+                    <div class="single-horizontal-timeline">
+                        <div class="experience-time">
+                            <h2>Primer paso</h2>
+                        </div><!--/.experience-time-->
+                        <div class="timeline-horizontal-border">
+                            <i class="fa fa-circle" aria-hidden="true"></i>
+                            <span class="single-timeline-horizontal"></span>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-content">
+                                <h4 class="title">Subir el Excel</h4>
+                                <p class="description">
+                                    Sube el archivo Excel. Asegúrate de que las columnas estén correctamente nombradas como: idLista, idProducto y precio.
+                                </p>
+                            </div><!--/.timeline-content-->
+                        </div><!--/.timeline-->
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="single-horizontal-timeline">
+                        <div class="experience-time">
+                            <h2>Segundo paso</h2>
+                        </div><!--/.experience-time-->
+                        <div class="timeline-horizontal-border">
+                            <i class="fa fa-circle" aria-hidden="true"></i>
+                            <span class="single-timeline-horizontal"></span>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-content">
+                                <h4 class="title">Verificar Precios</h4>
+                                <p class="description">
+                                    Verifica en la sección de listas que los precios se hayan cargado correctamente.	
+                                </p>
+                            </div><!--/.timeline-content-->
+                        </div><!--/.timeline-->
+                    </div>
+                 
+                </div>
+                <div class="step">
+                    <div class="single-horizontal-timeline">
+                        <div class="experience-time">
+                            <h2>Tercer paso</h2>
+                        </div><!--/.experience-time-->
+                        <div class="timeline-horizontal-border">
+                            <i class="fa fa-circle" aria-hidden="true"></i>
+                            <span class="single-timeline-horizontal"></span>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-content">
+                                <h4 class="title">Guardar Precios Anteriores</h4>
+                                <p class="description">
+                                    En este paso borraras los precios especiales viejos de los clientes con bolsita.
+                                </p>
+                            </div><!--/.timeline-content-->
+                        </div><!--/.timeline-->
+                    </div>
+                    
+                  
+                </div>
+              </div>
+              <div class="carousel-slide">
+                <div class="step">
+                    <div class="single-horizontal-timeline">
+                        <div class="experience-time">
+                            <h2>Cuarto paso</h2>
+                        </div><!--/.experience-time-->
+                        <div class="timeline-horizontal-border">
+                            <i class="fa fa-circle" aria-hidden="true"></i>
+                            <span class="single-timeline-horizontal"></span>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-content">
+                                <h4 class="title">Sincronizar Precios en Aguas</h4>
+                                <p class="description">
+                                    Sincroniza los precios actualizados con la base de datos.
+                                </p>
+                            </div><!--/.timeline-content-->
+                        </div><!--/.timeline-->
+                    </div>
+                  
+                </div>
+                <div class="step">
+                    <div class="single-horizontal-timeline">
+                        <div class="experience-time">
+                            <h2>Quinto paso</h2>
+                        </div><!--/.experience-time-->
+                        <div class="timeline-horizontal-border">
+                            <i class="fa fa-circle" aria-hidden="true"></i>
+                            <span class="single-timeline-horizontal"></span>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-content">
+                                <h4 class="title">Crear Precios Especiales</h4>
+                                <p class="description">
+                                    Crea precios especiales para clientes específicos.
+    
+                                </p>
+                            </div><!--/.timeline-content-->
+                        </div><!--/.timeline-->
+                    </div>
+                  
+                </div>
+              </div>
+            </div>
+            <button class="carousel-btn prev" onclick="prevSlide()">&#10094;</button>
+            <button class="carousel-btn next" onclick="nextSlide()">&#10095;</button>
+          </div>
+        <div id="stepsCarousel" class="carousel slide" data-ride="carousel">
+            <!-- Indicadores -->
+            <ol class="carousel-indicators">
+                <li data-target="#stepsCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#stepsCarousel" data-slide-to="1"></li>
+            </ol>
+    
+        
+    
+        
+    
+    
+    </section>
 </body>
 {% endblock contenidoCambiante %}

@@ -1,0 +1,320 @@
+{% extends "AppCambioPrecios/base.html" %}
+{% block titulo %} Gestión Precios | Sincronizar {% endblock %}
+{% block ttituloBanner %}
+<h2 class="animated-title">
+    Sincronizar <span></span> los <br />
+    Precios<span> Especiales.</span>
+</h2>
+<div class="container">
+    
+    {% if messages %}
+        <div class="alert alert-info" role="alert">
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <form method="post" action="{% url 'ejecutar_segundo_script' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-ejecutar" onclick="confirmarAccion(event)">Ejecutar Precisos Especiales</button>
+    </form>
+</div>
+{% endblock %}
+{% block contenidoCambiante %}
+<style>
+    .navbar {
+        background-color: black !important; 
+    }
+    .navbar .dropdown-menu {
+        background-color: black; /* Fondo negro para el menú desplegable */
+    }
+    .navbar .dropdown-menu a:hover {
+        color: #50C878 !important; /* Color verde esmeralda al pasar el cursor */
+        text-decoration: underline; /* Subrayar al pasar el cursor */
+    } 
+    .section-heading h2 {
+        padding-bottom: 0%;
+        border-bottom: none;
+    }
+    .animated-title {
+        font-size: 2rem; 
+        text-align: center; 
+        opacity: 0; 
+        transform: translateY(-20px); 
+        animation: fadeInUp 1s forwards; 
+    }
+    @keyframes fadeInUp {
+        to {
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+    }
+    .container {
+        
+        text-align: center;
+    }
+    .btn-ejecutar {
+        background-color: #50C878;
+        color: white;
+        border: none;
+        padding: 20px 20px;
+        font-size: 2.2rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .btn-ejecutar:hover {
+        background-color: #32e26d;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .btn-ejecutar:active {
+        background-color: #28a745;
+        transform: translateY(0);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .carousel-inner .item {
+            display: flex;
+            justify-content: center;
+        }
+        .carousel-inner .item .col-sm-4 {
+            float: none;
+            display: inline-block;
+            vertical-align: middle;
+        }
+		.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1450px;
+  margin: 2rem auto;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide {
+  display: flex;
+  flex: 1 0 100%;
+  justify-content: space-around;
+}
+
+.step {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 4rem;
+  text-align: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.step h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.step p {
+  font-size: 1rem;
+  color: #666;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .carousel-slide {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+.timeline-content p.description {
+        font-family: 'Arial', sans-serif;
+        font-size: 16px;
+        color: #666;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+</style>
+<script>
+    function confirmarAccion(event) {
+        event.preventDefault(); // Prevenir el envío del formulario por defecto
+        if (confirm("Usted está por impactar los nuevos precios especiales. ¿Desea continuar?")) {
+            event.target.form.submit(); // Enviar el formulario si se acepta
+        }
+    }
+    let currentSlide = 0;
+
+function showSlide() {
+  const carousel = document.querySelector('.carousel');
+  carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+}
+
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % 2;  // Hay dos "slides"
+  showSlide();
+}
+
+function prevSlide() {
+  currentSlide = (currentSlide - 1 + 2) % 2;
+  showSlide();
+}
+    
+</script>
+<section id="education" class="education">
+    <div class="section-heading text-center">
+        <h2>Pasos a seguir</h2>
+    </div>
+    <div class="carousel-container">
+        <div class="carousel">
+          <div class="carousel-slide">
+            <div class="step">
+                <div class="single-horizontal-timeline">
+                    <div class="experience-time">
+                        <h2>Primer paso</h2>
+                    </div><!--/.experience-time-->
+                    <div class="timeline-horizontal-border">
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                        <span class="single-timeline-horizontal"></span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-content">
+                            <h4 class="title">Subir el Excel</h4>
+                            <p class="description">
+                                Sube el archivo Excel. Asegúrate de que las columnas estén correctamente nombradas como: idLista, idProducto y precio.
+                            </p>
+                        </div><!--/.timeline-content-->
+                    </div><!--/.timeline-->
+                </div>
+            </div>
+            <div class="step">
+                <div class="single-horizontal-timeline">
+                    <div class="experience-time">
+                        <h2>Segundo paso</h2>
+                    </div><!--/.experience-time-->
+                    <div class="timeline-horizontal-border">
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                        <span class="single-timeline-horizontal"></span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-content">
+                            <h4 class="title">Verificar Precios</h4>
+                            <p class="description">
+                                Verifica en la sección de listas que los precios se hayan cargado correctamente.	
+                            </p>
+                        </div><!--/.timeline-content-->
+                    </div><!--/.timeline-->
+                </div>
+             
+            </div>
+            <div class="step">
+                <div class="single-horizontal-timeline">
+                    <div class="experience-time">
+                        <h2>Tercer paso</h2>
+                    </div><!--/.experience-time-->
+                    <div class="timeline-horizontal-border">
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                        <span class="single-timeline-horizontal"></span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-content">
+                            <h4 class="title">Guardar Precios Anteriores</h4>
+                            <p class="description">
+                                En este paso borraras los precios especiales viejos de los clientes con bolsita.
+                            </p>
+                        </div><!--/.timeline-content-->
+                    </div><!--/.timeline-->
+                </div>
+                
+              
+            </div>
+          </div>
+          <div class="carousel-slide">
+            <div class="step">
+                <div class="single-horizontal-timeline">
+                    <div class="experience-time">
+                        <h2>Cuarto paso</h2>
+                    </div><!--/.experience-time-->
+                    <div class="timeline-horizontal-border">
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                        <span class="single-timeline-horizontal"></span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-content">
+                            <h4 class="title">Sincronizar Precios en Aguas</h4>
+                            <p class="description">
+                                Sincroniza los precios actualizados con la base de datos.
+                            </p>
+                        </div><!--/.timeline-content-->
+                    </div><!--/.timeline-->
+                </div>
+              
+            </div>
+            <div class="step">
+                <div class="single-horizontal-timeline">
+                    <div class="experience-time">
+                        <h2>Quinto paso</h2>
+                    </div><!--/.experience-time-->
+                    <div class="timeline-horizontal-border">
+                        <i class="fa fa-circle" aria-hidden="true"></i>
+                        <span class="single-timeline-horizontal"></span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-content">
+                            <h4 class="title">Crear Precios Especiales</h4>
+                            <p class="description">
+                                Crea precios especiales para clientes específicos.
+
+                            </p>
+                        </div><!--/.timeline-content-->
+                    </div><!--/.timeline-->
+                </div>
+              
+            </div>
+          </div>
+        </div>
+        <button class="carousel-btn prev" onclick="prevSlide()">&#10094;</button>
+        <button class="carousel-btn next" onclick="nextSlide()">&#10095;</button>
+      </div>
+    <div id="stepsCarousel" class="carousel slide" data-ride="carousel">
+        <!-- Indicadores -->
+        <ol class="carousel-indicators">
+            <li data-target="#stepsCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#stepsCarousel" data-slide-to="1"></li>
+        </ol>
+
+    
+
+    
+
+</section>
+
+{% endblock %}

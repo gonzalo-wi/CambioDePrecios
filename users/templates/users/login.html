@@ -1,71 +1,94 @@
-{% extends "AppCambioPrecios/base.html" %} {%block titulo%} Inicio de sesion {%endblock%}
+{% extends "AppCambioPrecios/base.html" %}
+{% block titulo %} Inicio de sesión {% endblock %}
 {% block ttituloBanner %}
 <h2>
   Inicio <span></span> de <br />
-  Sesion<span>.</span>
+  Sesión<span>.</span>
 </h2>
-
-{%endblock%} {%block contenidoCambiante%}
+{% endblock %}
+{% block contenidoCambiante %}
 <style>
   .about {
     padding: 0;
   }
-  h1{
+  h1 {
     color: #114c5f;
   }
 
   body {
     margin: 0;
     height: 100vh;
+    
     justify-content: center;
     align-items: center;
-    background-image: url("../../../AppCambioPrecios/static/AppCambioPrecios/assets/images/about/BannerAgua.jpg"); /* Cambia esta ruta */
+    background-image: url("../../../AppCambioPrecios/static/AppCambioPrecios/assets/images/about/gotasclaras.jpg"); /* Cambia esta ruta */
     background-size: cover;
     background-position: center;
+    font-family: 'Roboto', sans-serif; /* Fuente atractiva */
   }
-  
+
   .title-container {
     text-align: center;
     margin-top: 50px; /* Espacio desde la parte superior */
     color: white; /* Color del texto */
-    font-family: 'Arial', sans-serif; /* Tipo de fuente */
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7); /* Sombra para mejor legibilidad */
   }
 
   .title-container h1 {
-    font-size: 6rem; /* Tamaño del texto */
+    font-size: 4rem; /* Tamaño del texto */
     margin: 0; /* Sin margen */
-    padding: 50px 0; /* Espacio alrededor del texto */
+    padding: 100px 0; /* Espacio alrededor del texto */
     letter-spacing: 2px; /* Espaciado entre letras */
   }
 
   .login-container {
     background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco con opacidad */
-    padding: 20px;
+    padding: 30px;
     border-radius: 10px;
-    width: 300px;
-    max-width: 600px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    margin: auto;
-    margin-top: 20px; /* Espacio desde el título */
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px auto; /* Centrar el contenedor */
   }
-  
+
   .login-container h2 {
     margin-bottom: 20px;
     text-align: center;
     padding-bottom: 0;
+    color: #114c5f;
   }
 
   form {
     display: flex;
     flex-direction: column;
-    margin-left: -10px;
   }
-  
+
   form p {
     margin: 10px 0;
   }
-  
+
+  .form-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    padding-left: 40px; /* Espacio para el icono */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+
+  .form-group i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+  }
+
   .btn-submit {
     background-color: #50C878;
     color: white;
@@ -75,9 +98,14 @@
     cursor: pointer;
     transition: background-color 0.3s;
   }
-  
+
   .btn-submit:hover {
     background-color: #32e26d;
+  }
+
+  .errorlist {
+    color: red;
+    margin-bottom: 10px;
   }
 </style>
 
@@ -86,12 +114,22 @@
 </div>
 
 <div class="login-container">
+  <img src="../../../AppCambioPrecios/static/AppCambioPrecios/assets/logo/normas.ivess.png" alt="Logo" style="width: 50%; margin-bottom: 20px;" />
   <h2>Iniciar Sesión</h2>
   <form method="post">
       {% csrf_token %}
-      {{ form.as_p }}
+      <div class="form-group">
+          <i class="fas fa-user"></i>
+          {{ form.username }}
+      </div>
+      <div class="form-group">
+          <i class="fas fa-lock"></i>
+          {{ form.password }}
+      </div>
       <button type="submit" class="btn-submit">Iniciar sesión</button>
   </form>
 </div>
 
-{%endblock contenidoCambiante%}
+<!-- Agregar FontAwesome para los iconos -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+{% endblock contenidoCambiante %}

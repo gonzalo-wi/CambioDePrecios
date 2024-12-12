@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'unfold',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +41,50 @@ INSTALLED_APPS = [
     'AppCambioPrecios',
     'users',
 ]
+JAZZMIN_SETTINGS = {
+    "site_title": "Cambio de Precios",
+    "site_header": "Cambio de Precios",
+    "site_brand": "Admin",
+    "site_logo": "AppCambioPrecios/assets/logo/LogoLoguin.png",
+    "welcome_sign": "Bienvenido a Cambio de Precios",
+    "login_footer": "Bienvenido, por favor inicia sesión para continuar.",
+    "copyright": "wiñazki",
+    "search_model": "auth.User",
+    "user_avatar": None,
+    "show_ui_builder": True,
+}
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": True,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-navy",
+    "navbar": "navbar-primary navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": True,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": True,
+    "sidebar_nav_flat_style": False,
+    "theme": "litera",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    },
+    "actions_sticky_top": False
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
