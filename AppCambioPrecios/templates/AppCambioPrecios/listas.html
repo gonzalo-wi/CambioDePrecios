@@ -106,6 +106,7 @@
                           <tr>
                               <th>Nombre de Lista</th>
                               <th>ID Producto</th>
+                              <th>Descripción</th>
                               <th>Precio Actual</th>
                               <th>Precio Anterior</th>
                               <th>Modificar Precio</th>
@@ -116,15 +117,14 @@
                               <tr>
                                   <td>{{ precio.nombreDeLista }}</td>
                                   <td>{{ precio.idProducto }}</td>
+                                  <td>{{ precio.descripcion }}</td>
                                   <td>{{ precio.precio }}</td>
                                   <td>
-                                      {% with precios_anteriores|get_item:precio.idProducto as precio_anterior %}
-                                          {% if precio_anterior %}
-                                              {{ precio_anterior.precio_anterior }}
-                                          {% else %}
-                                              N/A
-                                          {% endif %}
-                                      {% endwith %}
+                                      {% if precio.precio_anterior %}
+                                          {{ precio.precio_anterior }}
+                                      {% else %}
+                                          N/A
+                                      {% endif %}
                                   </td>
                                   <td>
                                       <input type="text" name="precio_{{ precio.idProducto }}" class="form-control" placeholder="Nuevo Precio">
@@ -132,7 +132,7 @@
                               </tr>
                           {% empty %}
                               <tr>
-                                  <td colspan="5" class="empty-message">No hay precios disponibles.</td>
+                                  <td colspan="6" class="empty-message">No hay precios disponibles.</td>
                               </tr>
                           {% endfor %}
                       </tbody>

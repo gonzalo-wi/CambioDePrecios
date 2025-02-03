@@ -2,7 +2,7 @@ import pyodbc
 
 """conn_str = (
     "Driver={ODBC Driver 18 for SQL Server};"
-    "Server=192.168.0.234;"
+    "Server=192.168.0.;"
     "Database=H2O_JUMI;"
     "UID=h2o;"
     "PWD=Jumi1234;"

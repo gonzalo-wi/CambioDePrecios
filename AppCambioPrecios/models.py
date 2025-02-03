@@ -5,6 +5,7 @@ class Precio(models.Model):
    nombreDeLista = models.CharField(max_length=255)
    idListaPrecio = models.CharField(max_length=30)
    idProducto= models.CharField(max_length=30)
+   descripcion = models.CharField(max_length=255, blank=True, null=True)
    precio = models.DecimalField(max_digits=10, decimal_places=3)
 
    def __str__(self):

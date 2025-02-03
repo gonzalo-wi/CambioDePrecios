@@ -10,10 +10,10 @@ from django.db import connection
 def obtener_conexion():
     conn_str = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
-        "SERVER=192.168.0.234;"
+        "SERVER=192.168.0.5;"
         "DATABASE=H2O_JUMI;"
-        "UID=h2o;"
-        "PWD=Jumi1234;"
+        "UID=cafe;"
+        "PWD=JumiCAFE3241;"
         "TrustServerCertificate=yes;"
     )
     return pyodbc.connect(conn_str)
@@ -73,7 +73,7 @@ def ejecutar_primer_script():
         conn = obtener_conexion()
         cursor = conn.cursor()
         
-        # Ejecutar cada comando individualmente
+        
         for command in script_sql.split(';'):
             if command.strip():
                 cursor.execute(command)
@@ -84,112 +84,52 @@ def ejecutar_primer_script():
     except pyodbc.Error as e:
         print(f"Error al ejecutar el script SQL: {e}")
         
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()     
-def agregar_columna():
-    script = """
-    ALTER TABLE tmp_descuentosXporcentaje
-    ADD precio_mod NUMERIC(18,2);
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(script)
-def actualizar_precios():
-    script = """
-    UPDATE tmp_descuentosXporcentaje
-    SET precio_mod = (
-        SELECT dbo.Get_PrecioPorClienteProducto_sinprecioespecial(
-            tmp_descuentosXporcentaje.nrocta,
-            tmp_descuentosXporcentaje.idproducto,
-            0, 0
-        )
-    );
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(script)      
-def eliminar_precios_antiguos():
-    script = """
-    DELETE FROM Precios_Clientes
-    WHERE nrocta IN (
-        SELECT nrocta FROM tmp_descuentosXporcentaje
-    );
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(script)
-def insertar_nuevos_precios():
-    script = """
-    INSERT INTO Precios_Clientes (nrocta, idproducto, precio_descuento_esp)
-    SELECT
-        nrocta,
-        idproducto,
-        DBO.GET_ROUND_ESP(
-            DBO.GET_ROUND_UP_5(
-                ROUND(precio_mod - DBO.GET_ROUND_UP_5(
-                    ROUND(precio_mod * (descuento / 100), 0)
-                ), 0)
-            )
-        )
-    FROM tmp_descuentosXporcentaje
-    WHERE descuento > 0;
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(script)
-        
-def ejecutar_script_completo():
-    try:
-        agregar_columna()
-        actualizar_precios()
-        eliminar_precios_antiguos()
-        insertar_nuevos_precios()
-        print("Script ejecutado exitosamente.")
-    except Exception as e:
-        print(f"Error al ejecutar el script: {e}")     
+      
+
 
 def ejecutar_segundo_script():
-    try:
-        ejecutar_script_completo()
-        mensaje = "Script SQL ejecutado correctamente."
-        print(mensaje)
-    except Exception as e:
-        mensaje = f"Error al ejecutar el script SQL: {e}"
-        print(mensaje)
-    return mensaje           
-def sincronizar_precios():
-    mensaje = ""
-    cursor = None  
-    conn = None 
+    script_sql = """
+    alter table tmp_descuentosXporcentaje
+    add precio_mod numeric(18,2);
+
+    update tmp_descuentosXporcentaje 
+    set precio_mod = (select dbo.Get_PrecioPorClienteProducto_sinprecioespecial(tmp_descuentosXporcentaje.nrocta, tmp_descuentosXporcentaje.idproducto, 0, 0));
+
+    delete from Precios_Clientes 
+    where nrocta in (select nrocta from tmp_descuentosXporcentaje);
+
+    insert into Precios_Clientes
+    select nrocta, idproducto,
+        precio_descuento_esp = DBO.GET_ROUND_ESP(
+            DBO.GET_ROUND_UP_5(
+                round(precio_mod - DBO.GET_ROUND_UP_5(round(precio_mod * (descuento / 100), 0)), 0)
+            )
+        )
+    from tmp_descuentosXporcentaje
+    where descuento > 0;
+    """
+    
     try:
         conn = obtener_conexion()
-        cursor = conn.cursor()
-        
-        precios_locales = Precio.objects.all()
-        
-        for precio in precios_locales:
-            guardar_precio_anterior(precio)
-            actualizar_precio(cursor, precio)
+        if conn:
+            cursor = conn.cursor()
+            
+            # Dividir el script en sentencias individuales
+            commands = [cmd.strip() for cmd in script_sql.split(';') if cmd.strip()]
+            
+            for command in commands:
+                cursor.execute(command)  # Ejecutar cada sentencia SQL
+                conn.commit()  # Confirmar cambios después de cada sentencia
+                print(f"Ejecutado: {command[:50]}...")  # Imprime un resumen de la sentencia ejecutada
+                time.sleep(3)  # Pausa de 3 segundos (puedes ajustar este tiempo)
 
-        conn.commit()
-        
-        mensaje = "Sincronización exitosa."
-    
-    except pyodbc.Error as e:
-        mensaje = f"No se puede sincronizar: {e}"
-    
-    except ObjectDoesNotExist:
-        mensaje = "Error: No se encontraron precios locales."
-    
-    except Exception as e:
-        mensaje = f"Tiempo agotado o error inesperado: {e}"
-    
-    finally:
-        if cursor is not None:
             cursor.close()
-        if conn is not None:
             conn.close()
-    
-    return mensaje
+            print("Segundo script ejecutado exitosamente.")
+        else:
+            print("No se pudo establecer la conexión a la base de datos.")
+    except pyodbc.Error as e:
+        print(f"Error al conectar a la base de datos: {e}")
 def actualizar_precio(cursor, precio):
     query_update = """
         UPDATE dbo.Precios 

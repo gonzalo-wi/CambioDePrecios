@@ -22,6 +22,7 @@ from django.db.models import Q
 def inicio(request):
     return render(request, "AppCambioPrecios/inicio.html")
 
+
 @login_required
 def listas(request):
     precios = Precio.objects.all()
@@ -52,16 +53,18 @@ def listas(request):
         messages.success(request, "Precios actualizados correctamente.")
         return redirect('listas')
 
-    # Agrupar los precios por nombre de lista
+    # Agrupar los precios por nombre de lista y agregar precios anteriores
     precios_por_hoja = {}
     for precio in precios:
         if precio.nombreDeLista not in precios_por_hoja:
             precios_por_hoja[precio.nombreDeLista] = []
+        # Obtener el precio anterior
+        precio_anterior = PrecioAntiguo.objects.filter(idListaPrecio=precio.idListaPrecio, idProducto=precio.idProducto).order_by('-id').first()
+        precio.precio_anterior = precio_anterior.precio_anterior if precio_anterior else None
         precios_por_hoja[precio.nombreDeLista].append(precio)
 
-    precios_anteriores = {precio.idProducto: PrecioAntiguo.objects.filter(idProducto=precio.idProducto).order_by('-id').first() for precio in precios}
+    return render(request, 'AppCambioPrecios/listas.html', {'precios_por_hoja': precios_por_hoja, 'mensaje': mensaje})
 
-    return render(request, 'AppCambioPrecios/listas.html', {'precios_por_hoja': precios_por_hoja, 'precios_anteriores': precios_anteriores, 'mensaje': mensaje})
 @login_required
 def subir_archivo(request):
     if request.method == 'POST':
@@ -72,41 +75,37 @@ def subir_archivo(request):
                 sheet = wb[hoja]  
 
                 for fila in sheet.iter_rows(min_row=2, values_only=True):  
-                    idListaPrecio, idProducto, precio = fila
+                    idListaPrecio, idProducto, descripcion, precio = fila
 
-                    if idListaPrecio and idProducto and precio is not None:
+                    if idListaPrecio and idProducto and descripcion and precio is not None:
                         
                         precio_obj, created = Precio.objects.get_or_create(
                             nombreDeLista=hoja,
                             idListaPrecio=idListaPrecio,
                             idProducto=idProducto,
-                            defaults={'precio': precio}
+                            defaults={'descripcion': descripcion, 'precio': precio}
                         )
 
                         if not created:
-                            
+                            guardar_precio_anterior(precio_obj)
+                            precio_obj.descripcion = descripcion
                             precio_obj.precio = precio
                             precio_obj.save()
-                        else:
                             
-                            guardar_precio_anterior(precio_obj)
-
-            
             conn = obtener_conexion()
-            cursor = conn.cursor()
-            guardar_precios_clientes(cursor)
-            conn.commit()
-            
-
-            messages.success(request, "Archivo procesado correctamente y listas de precios actualizadas.")
-            return redirect('subir_archivo')
-
+            if conn:
+                cursor = conn.cursor()
+                guardar_precios_clientes(cursor)
+                conn.commit()
+                cursor.close()
+                conn.close()         
         except Exception as e:
-            messages.error(request, f"Error procesando el archivo: {e}")
-            return redirect('subir_archivo')
+            messages.error(request, f"Error al subir el archivo: {e}")
+        else:
+            messages.success(request, "Archivo subido y procesado correctamente.")
+        return redirect('listas')
 
     return render(request, 'AppCambioPrecios/subir_archivo.html')
-
 @login_required
 def sincronizar_precios_view(request):
     if request.method == 'POST':
@@ -149,14 +148,12 @@ def ejecutar_primer_script_view(request):
 def ejecutar_segundo_script_view(request):
     if request.method == 'POST':
         try:
-            mensaje = ejecutar_segundo_script()
-            if "Error" in mensaje:
-                messages.error(request, mensaje)
-            else:
-                messages.success(request, mensaje)
+            ejecutar_segundo_script()
+            messages.success(request, "Script ejecutado exitosamente.")
         except Exception as e:
-            messages.error(request, f"Error al ejecutar el script SQL: {e}")
-        return redirect('ejecutar_segundo_script')
+            messages.error(request, f"Error al ejecutar el script: {e}")
+        return redirect('ejecutar_segundo_script')  # Redirige a la vista deseada después de ejecutar el script
+
     return render(request, 'AppCambioPrecios/segundoScript.html')
 
 @login_required
